@@ -5,6 +5,20 @@
         size="sm"
         square
         transparent
+        :icon="
+          twitchStore.isFollowedChannelsReverseOrder
+            ? 'arrow-down-1-9'
+            : 'arrow-down-9-1'
+        "
+        @click="
+          twitchStore.reverseFollowedChannelsOrder(
+            !twitchStore.isFollowedChannelsReverseOrder
+          )
+        " />
+      <BaseButton
+        size="sm"
+        square
+        transparent
         icon="arrows-rotate"
         :loading="twitchStore.fetchFollowedChannelsStatus === 'loading'"
         @click="twitchStore.getFollowedChannels()" />
@@ -17,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount } from "vue";
+import { onBeforeMount, computed } from "vue";
 import { useMainStore } from "@/stores/main";
 import { useTwitchStore } from "@/stores/twitch";
 import BaseButton from "@/ui/BaseButton.vue";

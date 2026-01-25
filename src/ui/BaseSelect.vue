@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onUnmounted } from "vue";
 const props = defineProps<{
   options: { label: string; value: string }[];
 }>();
@@ -50,6 +50,28 @@ watch(
       props.options.find((opt) => opt.value === newValue) || null;
   }
 );
+
+// Close dropdown when clicking outside
+function handleClickOutside(event: Event) {
+  const target = event.target as HTMLElement;
+  const selectElement = document.querySelector(".base-select");
+  if (selectElement && !selectElement.contains(target)) {
+    isOpen.value = false;
+  }
+}
+
+// Add/remove event listener based on dropdown state
+watch(isOpen, (newValue) => {
+  if (newValue) {
+    document.addEventListener("click", handleClickOutside);
+  } else {
+    document.removeEventListener("click", handleClickOutside);
+  }
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", handleClickOutside);
+});
 </script>
 
 <style lang="scss" scoped>

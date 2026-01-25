@@ -8,6 +8,8 @@ import Extension from "./views/Extension.vue";
 import Auth from "./views/Auth.vue";
 import type { Component } from "vue";
 import { useMainStore, type TwitchData } from "./stores/main";
+import { useTwitchStore } from "./stores/twitch";
+const twitchStore = useTwitchStore();
 
 const mainStore = useMainStore();
 
@@ -25,25 +27,19 @@ const currentView = computed(() => {
 });
 
 onBeforeMount(async () => {
-  if (typeof chrome !== "undefined" && chrome.storage) {
-    mainStore.twitchAccessToken =
-      await mainStore.getStorageItem("twitchAccessToken");
+  const isFollowedChannelsReverseOrder = await mainStore.getStorageItem(
+    "isFollowedChannelsReverseOrder"
+  );
+  twitchStore.isFollowedChannelsReverseOrder = !!isFollowedChannelsReverseOrder;
 
-    const twitchData: TwitchData | null =
-      await mainStore.getStorageItem("twitchData");
-    console.log("Twitch Data: ", twitchData);
-    mainStore.setTwitchData(twitchData);
-  } else if (localStorage) {
-    mainStore.twitchAccessToken =
-      localStorage.getItem("twitchAccessToken") || "";
+  mainStore.twitchAccessToken =
+    await mainStore.getStorageItem("twitchAccessToken");
 
-    const twitchDataString = localStorage.getItem("twitchData");
-    const twitchData: TwitchData | null = twitchDataString
-      ? JSON.parse(twitchDataString)
-      : null;
-    console.log("Twitch Data: ", twitchData);
-    mainStore.setTwitchData(twitchData);
-  }
+  const twitchData: TwitchData | null =
+    await mainStore.getStorageItem("twitchData");
+
+  console.log("Twitch Data: ", twitchData);
+  mainStore.setTwitchData(twitchData);
 });
 </script>
 

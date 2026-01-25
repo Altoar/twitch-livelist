@@ -48,9 +48,10 @@ export interface TwitchUserApiResponse {
 export const useTwitchStore = defineStore("twitch", () => {
   const mainStore = useMainStore();
   const followedChannels = ref<TwitchApiStream[]>([]);
+  const isFollowedChannelsReverseOrder = ref(false);
   const topChannels = ref<TwitchApiStream[]>([]);
   const topChannelsCursor = ref<string | undefined>(undefined);
-  const topChannelsLanguage = ref<string | null>(null);
+  const topChannelsLanguage = ref<string>("all");
   const fetchFollowedChannelsStatus = ref<
     "idle" | "loading" | "error" | "success"
   >("idle");
@@ -115,6 +116,16 @@ export const useTwitchStore = defineStore("twitch", () => {
     }
   }
 
+  function reverseFollowedChannelsOrder(reverse: boolean) {
+    isFollowedChannelsReverseOrder.value = reverse;
+
+    followedChannels.value = followedChannels.value.reverse();
+
+    mainStore.setStorageItem({
+      isFollowedChannelsReverseOrder: isFollowedChannelsReverseOrder.value
+    });
+  }
+
   async function getFollowedChannels() {
     if (!mainStore.isLoggedIn) {
       console.warn(
@@ -153,7 +164,10 @@ export const useTwitchStore = defineStore("twitch", () => {
     } while (cursor);
 
     fetchFollowedChannelsStatus.value = "success";
-    followedChannels.value = allChannels;
+
+    followedChannels.value = isFollowedChannelsReverseOrder.value
+      ? allChannels.reverse()
+      : allChannels;
   }
 
   async function getTopChannels({
@@ -202,9 +216,11 @@ export const useTwitchStore = defineStore("twitch", () => {
     fetchFollowedChannelsStatus,
     fetchTopChannelsStatus,
     topChannelsLanguage,
+    isFollowedChannelsReverseOrder,
     validateToken,
     getTopChannels,
     getFollowedChannels,
-    getTwitchUser
+    getTwitchUser,
+    reverseFollowedChannelsOrder
   };
 });

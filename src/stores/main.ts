@@ -114,7 +114,11 @@ export const useMainStore = defineStore("main", () => {
       return result[key];
     } else if (typeof localStorage !== "undefined") {
       const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : null;
+      try {
+        return item ? JSON.parse(item) : null;
+      } catch {
+        return item;
+      }
     } else {
       throw new Error(
         "Neither chrome.storage nor localStorage is available. Could not get from storage."
