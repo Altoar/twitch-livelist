@@ -1,6 +1,5 @@
 <template>
   <component :is="currentView" />
-  {{ mainStore.twitchAccessToken }}
 </template>
 
 <script setup lang="ts">
@@ -25,17 +24,15 @@ const currentView = computed(() => {
   return routes[path] || (() => import("./views/NotFound.vue"));
 });
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
   if (typeof chrome !== "undefined" && chrome.storage) {
-    chrome.storage.sync.get(["twitchAccessToken"]).then((result) => {
-      console.log("Value get " + result.twitchAccessToken);
-      mainStore.twitchAccessToken = result.twitchAccessToken as string;
-    });
+    mainStore.twitchAccessToken =
+      await mainStore.getChromeStorage("twitchAccessToken");
 
-    chrome.storage.sync.get(["twitchData"]).then((result) => {
-      console.log("Twitch Data: " + JSON.stringify(result.twitchData));
-      mainStore.setTwitchData(result.twitchData as TwitchData | null);
-    });
+    const twitchData: TwitchData | null =
+      await mainStore.getChromeStorage("twitchData");
+    console.log("Twitch Data: ", twitchData);
+    mainStore.setTwitchData(twitchData);
   } else {
     console.log("chrome.runtime is undefined");
   }
@@ -57,5 +54,30 @@ body,
   color: var(--text-primary);
   height: 100%;
   width: 100%;
+}
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-secondary, #2f2f2f);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-color, #9147ff);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover, #772ce8);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color, #9147ff)
+    var(--background-secondary, #2f2f2f);
 }
 </style>

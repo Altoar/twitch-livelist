@@ -9,3 +9,10 @@ const props = defineProps<{
   href: string;
 }>();
 </script>
+
+<style scoped>
+a {
+  text-decoration: none;
+  color: inherit;
+}
+</style>

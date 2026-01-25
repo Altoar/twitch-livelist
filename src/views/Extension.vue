@@ -38,6 +38,8 @@ const currentView = computed(() => {
   height: 100%;
   min-height: 200px;
   min-width: 420px;
+  max-width: 400px;
+  max-height: 500px;
 }
 .content-area {
   flex-grow: 1;

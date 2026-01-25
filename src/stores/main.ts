@@ -86,6 +86,17 @@ export const useMainStore = defineStore("main", () => {
     }
   }
 
+  async function getChromeStorage(key: string): Promise<any> {
+    if (typeof chrome !== "undefined" && chrome.storage) {
+      const result = await chrome.storage.sync.get(key);
+      return result[key];
+    } else {
+      throw new Error(
+        "Not running in a Chrome extension environment. Could not get from chrome storage."
+      );
+    }
+  }
+
   function setTwitchData(data: TwitchData | null) {
     twitchData.value = data;
   }
@@ -98,6 +109,7 @@ export const useMainStore = defineStore("main", () => {
     authenticateTwitch,
     sendChromeMessage,
     setChromeStorage,
+    getChromeStorage,
     setTwitchData,
     logoutTwitch
   };
