@@ -36,7 +36,8 @@ const props = defineProps<{
 }>();
 const nav = ref([
   { name: "Follows", icon: "heart", link: "#/follows" },
-  { name: "Browse", icon: "trophy", link: "#/browse" }
+  { name: "Browse", icon: "trophy", link: "#/browse" },
+  { name: "Categories", icon: "gamepad", link: "#/categories" }
 ]);
 </script>
 
@@ -47,6 +48,7 @@ const nav = ref([
   height: 100%;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
 
   &__navigation {
     display: flex;

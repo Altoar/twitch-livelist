@@ -24,8 +24,15 @@ export interface TwitchApiStream {
   is_mature: boolean;
 }
 
-export interface TwitchApiStreamsResponse {
-  data: TwitchApiStream[];
+export interface TwitchApiCategory {
+  id: string;
+  name: string;
+  box_art_url: string;
+  igdb_id?: string;
+}
+
+export interface TwitchApiResponse {
+  data: TwitchApiStream[] | TwitchApiCategory[];
   pagination: {
     cursor?: string;
   };
@@ -52,12 +59,20 @@ export const useTwitchStore = defineStore("twitch", () => {
   const topChannels = ref<TwitchApiStream[]>([]);
   const topChannelsCursor = ref<string | undefined>(undefined);
   const topChannelsLanguage = ref<string>("all");
+  const topChannelsCategory = ref({
+    id: "all",
+    name: "All Categories"
+  });
+  const topCategories = ref<TwitchApiCategory[]>([]);
   const fetchFollowedChannelsStatus = ref<
     "idle" | "loading" | "error" | "success"
   >("idle");
   const fetchTopChannelsStatus = ref<"idle" | "loading" | "error" | "success">(
     "idle"
   );
+  const fetchTopCategoriesStatus = ref<
+    "idle" | "loading" | "error" | "success"
+  >("idle");
 
   async function validateToken(): Promise<boolean> {
     const mainStore = useMainStore();
@@ -145,16 +160,19 @@ export const useTwitchStore = defineStore("twitch", () => {
       fetchFollowedChannelsStatus.value = "loading";
 
       try {
-        const response: TwitchApiStreamsResponse =
-          await callApi<TwitchApiStreamsResponse>("/streams/followed", "GET", {
+        const response: TwitchApiResponse = await callApi<TwitchApiResponse>(
+          "/streams/followed",
+          "GET",
+          {
             params: {
               user_id: mainStore.twitchData?.user?.id,
               first: 100,
               after: cursor
             }
-          });
+          }
+        );
 
-        allChannels.push(...response.data);
+        allChannels.push(...(response.data as TwitchApiStream[]));
         cursor = response.pagination.cursor;
       } catch (error) {
         console.error("Error fetching followed channels:", error);
@@ -172,7 +190,7 @@ export const useTwitchStore = defineStore("twitch", () => {
 
   async function getTopChannels({
     language = "all",
-    game = undefined,
+    game = "all",
     reset = false
   }) {
     if (fetchTopChannelsStatus.value === "loading") {
@@ -185,28 +203,44 @@ export const useTwitchStore = defineStore("twitch", () => {
     fetchTopChannelsStatus.value = "loading";
 
     try {
-      const response = await callApi<TwitchApiStreamsResponse>(
-        "/streams",
-        "GET",
-        {
-          params: {
-            first: 30,
-            after: topChannelsCursor.value,
-            game_id: game,
-            language: language === "all" ? undefined : language
-          }
+      const response = await callApi<TwitchApiResponse>("/streams", "GET", {
+        params: {
+          first: 30,
+          after: topChannelsCursor.value,
+          game_id: game === "all" ? undefined : game,
+          language: language === "all" ? undefined : language
         }
-      );
+      });
       if (reset) {
-        topChannels.value = response.data;
+        topChannels.value = response.data as TwitchApiStream[];
       } else {
-        topChannels.value.push(...response.data);
+        topChannels.value.push(...(response.data as TwitchApiStream[]));
       }
       topChannelsCursor.value = response.pagination.cursor;
       fetchTopChannelsStatus.value = "success";
     } catch (error) {
       fetchTopChannelsStatus.value = "error";
       console.error("Error fetching top channels:", error);
+    }
+  }
+
+  async function getTopCategories() {
+    if (fetchTopChannelsStatus.value === "loading") {
+      return;
+    }
+
+    try {
+      fetchTopCategoriesStatus.value = "loading";
+      const response = await callApi<TwitchApiResponse>("/games/top", "GET", {
+        params: {
+          first: 100
+        }
+      });
+      fetchTopCategoriesStatus.value = "success";
+      topCategories.value = response.data as TwitchApiCategory[];
+    } catch (error) {
+      fetchTopCategoriesStatus.value = "error";
+      console.error("Error fetching top categories:", error);
     }
   }
 
@@ -217,10 +251,13 @@ export const useTwitchStore = defineStore("twitch", () => {
     fetchTopChannelsStatus,
     topChannelsLanguage,
     isFollowedChannelsReverseOrder,
+    topCategories,
+    topChannelsCategory,
     validateToken,
     getTopChannels,
     getFollowedChannels,
     getTwitchUser,
-    reverseFollowedChannelsOrder
+    reverseFollowedChannelsOrder,
+    getTopCategories
   };
 });

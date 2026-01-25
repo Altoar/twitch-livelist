@@ -17,19 +17,24 @@ import TopBar from "../components/TopBar.vue";
 import SideNav from "../components/SideNav.vue";
 import ContentFollows from "@/components/ContentFollows.vue";
 import ContentBrowse from "@/components/ContentBrowse.vue";
+import ContentCategories from "@/components/ContentCategories.vue";
 import ContentNotLoggedIn from "@/components/ContentNotLoggedIn.vue";
 import { useMainStore } from "@/stores/main";
 const mainStore = useMainStore();
 
 const routes = {
   "/follows": ContentFollows,
-  "/browse": ContentBrowse
+  "/browse": ContentBrowse,
+  "/categories": ContentCategories
 };
 
-const currentPath = ref(window.location.hash || "#/follows");
+const currentPath = ref(window.location.hash);
+
+// Clean query parameters from initial path
+currentPath.value = currentPath.value.split("?")[0] || "#/follows";
 
 window.addEventListener("hashchange", () => {
-  currentPath.value = window.location.hash;
+  currentPath.value = window.location.hash.split("?")[0] || "#/follows";
 });
 
 const currentView = computed(() => {

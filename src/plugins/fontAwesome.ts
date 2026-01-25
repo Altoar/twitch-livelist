@@ -6,7 +6,9 @@ import {
   faArrowRightFromBracket,
   faTrophy,
   faArrowDown19,
-  faArrowDown91
+  faArrowDown91,
+  faGamepad,
+  faRotateLeft
 } from "@fortawesome/free-solid-svg-icons";
 
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
@@ -22,7 +24,9 @@ library.add(
   faTwitch,
   faTrophy,
   faArrowDown19,
-  faArrowDown91
+  faArrowDown91,
+  faGamepad,
+  faRotateLeft
 );
 
 export default FontAwesomeIcon;

@@ -77,7 +77,7 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .base-select {
   position: relative;
-  width: 120px;
+  width: 100px;
   font-family: Arial, sans-serif;
   font-size: 14px;
 
