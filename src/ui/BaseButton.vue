@@ -12,7 +12,7 @@ const props = defineProps<{
   title?: string;
   size?: "sm" | "md" | "lg";
   loading?: boolean;
-  icon?: string;
+  icon?: string | [string, string];
 }>();
 
 const classes = computed(() => {

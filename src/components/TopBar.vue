@@ -3,21 +3,12 @@
     <div class="title">Twitch Live List</div>
     <div class="user" v-if="mainStore.isLoggedIn">
       {{ mainStore.twitchData?.user?.displayName }}
-      <BaseButton
-        icon="arrow-right-from-bracket"
-        size="sm"
-        @click="mainStore.logoutTwitch()" />
     </div>
-    <BaseLink :href="mainStore.authLink" v-else
-      ><BaseButton title="Login with Twitch" size="sm"
-    /></BaseLink>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useMainStore } from "@/stores/main";
-import BaseButton from "@/ui/BaseButton.vue";
-import BaseLink from "@/ui/BaseLink.vue";
 const mainStore = useMainStore();
 </script>
 

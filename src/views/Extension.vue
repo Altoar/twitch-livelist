@@ -2,8 +2,11 @@
   <TopBar />
   <div class="main-content">
     <SideNav :current-path="currentPath" />
-    <div class="content-area">
+    <div class="content-area" v-if="mainStore.isLoggedIn">
       <component :is="currentView" />
+    </div>
+    <div class="content-area" v-else>
+      <ContentNotLoggedIn />
     </div>
   </div>
 </template>
@@ -14,6 +17,9 @@ import TopBar from "../components/TopBar.vue";
 import SideNav from "../components/SideNav.vue";
 import ContentFollows from "@/components/ContentFollows.vue";
 import ContentBrowse from "@/components/ContentBrowse.vue";
+import ContentNotLoggedIn from "@/components/ContentNotLoggedIn.vue";
+import { useMainStore } from "@/stores/main";
+const mainStore = useMainStore();
 
 const routes = {
   "/follows": ContentFollows,
@@ -37,8 +43,7 @@ const currentView = computed(() => {
   display: flex;
   height: 100%;
   min-height: 200px;
-  min-width: 420px;
-  max-width: 450px;
+  width: 450px;
   max-height: 500px;
 }
 .content-area {
