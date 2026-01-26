@@ -8,7 +8,8 @@ import {
   faArrowDown19,
   faArrowDown91,
   faGamepad,
-  faRotateLeft
+  faRotateLeft,
+  faGear
 } from "@fortawesome/free-solid-svg-icons";
 
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
@@ -26,7 +27,8 @@ library.add(
   faArrowDown19,
   faArrowDown91,
   faGamepad,
-  faRotateLeft
+  faRotateLeft,
+  faGear
 );
 
 export default FontAwesomeIcon;

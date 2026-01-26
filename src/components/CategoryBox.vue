@@ -29,5 +29,10 @@ const getBoxArtUrl = computed(() => {
   background-size: cover;
   background-position: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    filter: brightness(0.9);
+    box-shadow: 0 0px 6px var(--accent-color);
+  }
 }
 </style>

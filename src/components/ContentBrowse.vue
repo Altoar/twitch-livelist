@@ -3,7 +3,7 @@
     <div class="content-browse__header">
       <div class="content-browse__title">
         <span>{{
-          twitchStore.topChannelsCategory?.name || "All Categories"
+          twitchStore.topChannelsCategory?.name || "Top Channels"
         }}</span>
         <BaseButton
           size="sm"
@@ -11,7 +11,7 @@
           transparent
           v-if="twitchStore.topChannelsCategory.id !== 'all'"
           icon="rotate-left"
-          @click="resetCategory" />
+          @click="twitchStore.resetTopChannelsCategory" />
       </div>
       <div class="content-browse__actions">
         <BaseSelect
@@ -42,25 +42,27 @@
           " />
       </div>
     </div>
+    <ContentLoading v-if="twitchStore.fetchTopChannelsStatus === 'loading'" />
+    <template v-else>
+      <StreamListItem
+        v-for="channel in twitchStore.topChannels"
+        :key="channel.id"
+        :stream="channel" />
 
-    <StreamListItem
-      v-for="channel in twitchStore.topChannels"
-      :key="channel.id"
-      :stream="channel" />
-
-    <div class="content-browse__footer">
-      <BaseButton
-        size="sm"
-        title="Load More"
-        primary
-        icon="arrows-rotate"
-        :loading="false"
-        @click="
-          twitchStore.getTopChannels({
-            language: twitchStore.topChannelsLanguage as string
-          })
-        " />
-    </div>
+      <div class="content-browse__footer">
+        <BaseButton
+          size="sm"
+          title="Load More"
+          primary
+          icon="arrows-rotate"
+          :loading="false"
+          @click="
+            twitchStore.getTopChannels({
+              language: twitchStore.topChannelsLanguage as string
+            })
+          " />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -70,6 +72,7 @@ import { useTwitchStore } from "@/stores/twitch";
 import StreamListItem from "./StreamListItem.vue";
 import BaseButton from "@/ui/BaseButton.vue";
 import BaseSelect from "@/ui/BaseSelect.vue";
+import ContentLoading from "./ContentLoading.vue";
 
 const twitchStore = useTwitchStore();
 const categoryId = computed(() => {
@@ -84,19 +87,6 @@ const languages = ref([
   { label: "French", value: "fr" },
   { label: "Japanese", value: "ja" }
 ]);
-
-function resetCategory() {
-  twitchStore.topChannelsCategory = {
-    id: "all",
-    name: "All Categories"
-  };
-
-  twitchStore.getTopChannels({
-    reset: true,
-    language: twitchStore.topChannelsLanguage as string,
-    game: "all"
-  });
-}
 
 onBeforeMount(() => {
   twitchStore.getTopChannels({

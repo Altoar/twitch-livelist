@@ -88,6 +88,7 @@ function calculateLiveDuration(startedAt: string) {
     position: relative;
     flex-shrink: 0;
     width: 130px;
+    background: var(--background-secondary);
     img {
       width: 100%;
       height: 100%;

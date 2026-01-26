@@ -61,7 +61,7 @@ export const useTwitchStore = defineStore("twitch", () => {
   const topChannelsLanguage = ref<string>("all");
   const topChannelsCategory = ref({
     id: "all",
-    name: "All Categories"
+    name: "Top Channels"
   });
   const topCategories = ref<TwitchApiCategory[]>([]);
   const fetchFollowedChannelsStatus = ref<
@@ -224,6 +224,21 @@ export const useTwitchStore = defineStore("twitch", () => {
     }
   }
 
+  function resetTopChannelsCategory() {
+    topChannelsCategory.value = {
+      id: "all",
+      name: "Top Channels"
+    };
+
+    topChannelsCursor.value = undefined;
+
+    getTopChannels({
+      game: "all",
+      language: topChannelsLanguage.value,
+      reset: true
+    });
+  }
+
   async function getTopCategories() {
     if (fetchTopChannelsStatus.value === "loading") {
       return;
@@ -258,6 +273,7 @@ export const useTwitchStore = defineStore("twitch", () => {
     getFollowedChannels,
     getTwitchUser,
     reverseFollowedChannelsOrder,
-    getTopCategories
+    getTopCategories,
+    resetTopChannelsCategory
   };
 });
