@@ -18,15 +18,7 @@
         <BaseSelect
           :options="languages"
           v-model="twitchStore.topChannelsLanguage"
-          @update:modelValue="
-            () => {
-              twitchStore.getTopChannels({
-                reset: true,
-                language: twitchStore.topChannelsLanguage,
-                game: categoryId
-              });
-            }
-          " />
+          @update:modelValue="selectLanguage" />
 
         <BaseButton
           size="sm"
@@ -80,6 +72,8 @@ import StreamListItem from "./StreamListItem.vue";
 import BaseButton from "@/ui/BaseButton.vue";
 import BaseSelect from "@/ui/BaseSelect.vue";
 import ContentLoading from "./ContentLoading.vue";
+import { useMainStore } from "@/stores/main";
+const mainStore = useMainStore();
 
 const twitchStore = useTwitchStore();
 const categoryId = computed(() => {
@@ -95,7 +89,27 @@ const languages = ref([
   { label: "Japanese", value: "ja" }
 ]);
 
-onBeforeMount(() => {
+function selectLanguage() {
+  twitchStore.getTopChannels({
+    reset: true,
+    language: twitchStore.topChannelsLanguage,
+    game: categoryId.value
+  });
+
+  mainStore.setStorageItem({
+    topChannelsLanguage: twitchStore.topChannelsLanguage
+  });
+}
+
+onBeforeMount(async () => {
+  const topChannelsLanguage = await mainStore.getStorageItem(
+    "topChannelsLanguage"
+  );
+
+  if (topChannelsLanguage) {
+    twitchStore.topChannelsLanguage = topChannelsLanguage;
+  }
+
   twitchStore.getTopChannels({
     reset: true,
     language: twitchStore.topChannelsLanguage as string,
