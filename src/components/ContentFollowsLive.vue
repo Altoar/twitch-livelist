@@ -35,7 +35,7 @@
     <div
       class="content-follows__empty"
       v-if="
-        !twitchStore.followedChannels.length &&
+        !twitchStore.followedLiveChannels.length &&
         twitchStore.fetchFollowedChannelsStatus === 'success'
       ">
       You are not following any channels. Go follow some streamers on Twitch!
@@ -45,8 +45,8 @@
       v-else-if="twitchStore.fetchFollowedChannelsStatus === 'loading'" />
 
     <template v-else>
-      <StreamListItem
-        v-for="channel in twitchStore.followedChannels"
+      <LiveStreamListItem
+        v-for="channel in twitchStore.followedLiveChannels"
         :key="channel.id"
         :stream="channel" />
     </template>
@@ -57,7 +57,7 @@
 import { onBeforeMount } from "vue";
 import { useTwitchStore } from "@/stores/twitch";
 import BaseButton from "@/ui/BaseButton.vue";
-import StreamListItem from "./StreamListItem.vue";
+import LiveStreamListItem from "./LiveStreamListItem.vue";
 import ContentLoading from "./ContentLoading.vue";
 
 const twitchStore = useTwitchStore();

@@ -32,7 +32,16 @@ export interface TwitchApiCategory {
 }
 
 export interface TwitchApiResponse {
+  total?: number;
   data: TwitchApiStream[] | TwitchApiCategory[];
+  pagination: {
+    cursor?: string;
+  };
+}
+
+export interface TwitchApiFollowedChannelsResponse {
+  total?: number;
+  data: TwitchApiFollowedChannel[];
   pagination: {
     cursor?: string;
   };
@@ -52,11 +61,28 @@ export interface TwitchUserApiResponse {
   created_at: string;
 }
 
+export interface TwitchApiFollowedChannel {
+  broadcaster_id: string;
+  broadcaster_login: string;
+  broadcaster_name: string;
+  followed_at: string;
+}
+
+export interface FollowedChannel {
+  id: string;
+  login: string;
+  displayName: string;
+  profileImageUrl: string;
+  followedAt: string;
+  broadcasterType: string;
+}
+
 type FetchStatus = "idle" | "loading" | "error" | "success";
 
 export const useTwitchStore = defineStore("twitch", () => {
   const mainStore = useMainStore();
-  const followedChannels = ref<TwitchApiStream[]>([]);
+  const followedLiveChannels = ref<TwitchApiStream[]>([]);
+  const followedChannels = ref<FollowedChannel[]>([]);
   const isFollowedChannelsReverseOrder = ref(false);
   const topChannels = ref<TwitchApiStream[]>([]);
   const topChannelsCursor = ref<string | undefined>(undefined);
@@ -134,7 +160,7 @@ export const useTwitchStore = defineStore("twitch", () => {
   function reverseFollowedChannelsOrder(reverse: boolean) {
     isFollowedChannelsReverseOrder.value = reverse;
 
-    followedChannels.value = followedChannels.value.reverse();
+    followedLiveChannels.value = followedLiveChannels.value.reverse();
 
     mainStore.setStorageItem({
       isFollowedChannelsReverseOrder: isFollowedChannelsReverseOrder.value
@@ -183,9 +209,85 @@ export const useTwitchStore = defineStore("twitch", () => {
 
     fetchFollowedChannelsStatus.value = "success";
 
-    followedChannels.value = isFollowedChannelsReverseOrder.value
+    followedLiveChannels.value = isFollowedChannelsReverseOrder.value
       ? allChannels.reverse()
       : allChannels;
+  }
+
+  async function getFollowedChannels() {
+    if (!mainStore.isLoggedIn) {
+      console.warn(
+        "User is not logged in to Twitch, cannot fetch followed channels"
+      );
+      return;
+    }
+
+    if (fetchFollowedChannelsStatus.value === "loading") {
+      return;
+    }
+
+    const allChannels: FollowedChannel[] = [];
+    let cursorFollowedChannels: string | undefined = undefined;
+
+    do {
+      fetchFollowedChannelsStatus.value = "loading";
+
+      try {
+        const responseFollowedChannels: TwitchApiFollowedChannelsResponse =
+          await callApi<TwitchApiFollowedChannelsResponse>(
+            "/channels/followed",
+            "GET",
+            {
+              params: {
+                user_id: mainStore.twitchData?.user?.id,
+                first: 100,
+                after: cursorFollowedChannels
+              }
+            }
+          );
+
+        // Get profile pictures for each followed channel
+        const channelIds = responseFollowedChannels.data.map(
+          (channel) => channel.broadcaster_id
+        );
+        const userResponse = await callApi<{ data: TwitchUserApiResponse[] }>(
+          "/users",
+          "GET",
+          {
+            params: {
+              id: channelIds
+            }
+          }
+        );
+
+        const userMap: Record<string, TwitchUserApiResponse> = {};
+        userResponse.data.forEach((user) => {
+          userMap[user.id] = user;
+        });
+
+        allChannels.push(
+          ...responseFollowedChannels.data.map((channel) => ({
+            id: channel.broadcaster_id,
+            login: channel.broadcaster_login,
+            displayName: channel.broadcaster_name,
+            profileImageUrl:
+              userMap[channel.broadcaster_id]?.profile_image_url || "",
+            broadcasterType:
+              userMap[channel.broadcaster_id]?.broadcaster_type || "",
+            followedAt: channel.followed_at
+          }))
+        );
+
+        cursorFollowedChannels = responseFollowedChannels.pagination.cursor;
+      } catch (error) {
+        console.error("Error fetching followed channels:", error);
+        fetchFollowedChannelsStatus.value = "error";
+        return;
+      }
+    } while (cursorFollowedChannels);
+
+    fetchFollowedChannelsStatus.value = "success";
+    followedChannels.value = allChannels;
   }
 
   async function getTopChannels({
@@ -268,7 +370,7 @@ export const useTwitchStore = defineStore("twitch", () => {
 
   return {
     topChannels,
-    followedChannels,
+    followedLiveChannels,
     fetchFollowedChannelsStatus,
     fetchTopChannelsStatus,
     topChannelsLanguage,
@@ -276,12 +378,15 @@ export const useTwitchStore = defineStore("twitch", () => {
     topCategories,
     topChannelsCategory,
     fetchTopChannelsLoadMoreStatus,
+    followedChannels,
+    fetchTopCategoriesStatus,
     validateToken,
     getTopChannels,
     getFollowedLiveChannels,
     getTwitchUser,
     reverseFollowedChannelsOrder,
     getTopCategories,
-    resetTopChannelsCategory
+    resetTopChannelsCategory,
+    getFollowedChannels
   };
 });

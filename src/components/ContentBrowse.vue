@@ -42,7 +42,7 @@
         twitchStore.fetchTopChannelsLoadMoreStatus !== 'loading'
       " />
     <template v-else>
-      <StreamListItem
+      <LiveStreamListItem
         v-for="channel in twitchStore.topChannels"
         :key="channel.id"
         :stream="channel" />
@@ -68,7 +68,7 @@
 <script setup lang="ts">
 import { ref, onBeforeMount, computed } from "vue";
 import { useTwitchStore } from "@/stores/twitch";
-import StreamListItem from "./StreamListItem.vue";
+import LiveStreamListItem from "./LiveStreamListItem.vue";
 import BaseButton from "@/ui/BaseButton.vue";
 import BaseSelect from "@/ui/BaseSelect.vue";
 import ContentLoading from "./ContentLoading.vue";

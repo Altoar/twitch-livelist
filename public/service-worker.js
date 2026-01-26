@@ -1,3 +1,7 @@
+// Connect to Twitch EventSub Websocket for real-time updates when channels go live
+// import { setupTwitchEventSubWebSocket } from "./twitch-websocket.js";
+// setupTwitchEventSubWebSocket();
+
 async function validateToken(token) {
   const response = await fetch("https://id.twitch.tv/oauth2/validate", {
     headers: {

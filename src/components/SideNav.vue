@@ -38,9 +38,10 @@ const props = defineProps<{
   currentPath: string;
 }>();
 const nav = ref([
-  { name: "Follows", icon: "heart", link: "#/follows" },
+  { name: "Live Followed", icon: "heart", link: "#/followed-live" },
   { name: "Browse", icon: "list", link: "#/browse" },
-  { name: "Categories", icon: "gamepad", link: "#/categories" }
+  { name: "Categories", icon: "gamepad", link: "#/categories" },
+  { name: "All Followed", icon: "address-book", link: "#/followed-all" }
 ]);
 </script>
 

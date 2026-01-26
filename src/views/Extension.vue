@@ -15,7 +15,8 @@
 import { computed, ref } from "vue";
 import TopBar from "../components/TopBar.vue";
 import SideNav from "../components/SideNav.vue";
-import ContentFollows from "@/components/ContentFollows.vue";
+import ContentFollowsLive from "@/components/ContentFollowsLive.vue";
+import ContentFollowsAll from "@/components/ContentFollowsAll.vue";
 import ContentBrowse from "@/components/ContentBrowse.vue";
 import ContentCategories from "@/components/ContentCategories.vue";
 import ContentNotLoggedIn from "@/components/ContentNotLoggedIn.vue";
@@ -24,24 +25,29 @@ import { useMainStore } from "@/stores/main";
 const mainStore = useMainStore();
 
 const routes = {
-  "/follows": ContentFollows,
+  "/followed-live": ContentFollowsLive,
   "/browse": ContentBrowse,
   "/categories": ContentCategories,
-  "/settings": ContentSettings
+  "/settings": ContentSettings,
+  "/followed-all": ContentFollowsAll
 };
+
+const defaultRoute = "/followed-live";
 
 const currentPath = ref(window.location.hash);
 
-// Clean query parameters from initial path
-currentPath.value = currentPath.value.split("?")[0] || "#/follows";
+// Clean query parameters and set initial path
+const cleanPath = (path: string) => path.split("?")[0] || defaultRoute;
+
+currentPath.value = cleanPath(window.location.hash);
 
 window.addEventListener("hashchange", () => {
-  currentPath.value = window.location.hash.split("?")[0] || "#/follows";
+  currentPath.value = cleanPath(window.location.hash);
 });
 
 const currentView = computed(() => {
-  const path = currentPath.value.slice(1) || "/follows";
-  return routes[path as keyof typeof routes] || routes["/follows"];
+  const path = currentPath.value.slice(1) || defaultRoute.slice(1);
+  return routes[path as keyof typeof routes] || routes[defaultRoute];
 });
 </script>
 

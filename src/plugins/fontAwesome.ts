@@ -10,7 +10,8 @@ import {
   faGamepad,
   faRotateLeft,
   faGear,
-  faAddressBook
+  faAddressBook,
+  faCircleCheck
 } from "@fortawesome/free-solid-svg-icons";
 
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
@@ -30,7 +31,8 @@ library.add(
   faGamepad,
   faRotateLeft,
   faGear,
-  faAddressBook
+  faAddressBook,
+  faCircleCheck
 );
 
 export default FontAwesomeIcon;
