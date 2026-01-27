@@ -20,6 +20,9 @@
         </span>
       </div>
     </div>
+    <div class="channel-list-item__date">
+      {{ formatDate(props.channel.followedAt) }}
+    </div>
   </div>
 </template>
 
@@ -29,6 +32,15 @@ import BaseLink from "@/ui/BaseLink.vue";
 const props = defineProps<{
   channel: FollowedChannel;
 }>();
+
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  });
+}
 </script>
 
 <style lang="scss" scoped>
@@ -66,6 +78,14 @@ const props = defineProps<{
 
   &__partner {
     color: var(--color-accent);
+  }
+
+  &__date {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
   }
 }
 </style>

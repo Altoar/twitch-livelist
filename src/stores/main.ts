@@ -92,7 +92,6 @@ export const useMainStore = defineStore("main", () => {
         type: message.type,
         data: message.data
       });
-      console.log("Sent message to chrome extension:", message);
     } else {
       console.warn(
         "Not running in a Chrome extension environment. Could not send message."
@@ -103,7 +102,6 @@ export const useMainStore = defineStore("main", () => {
   async function setStorageItem(data: { [key: string]: any }): Promise<void> {
     if (typeof chrome !== "undefined" && chrome.storage) {
       await chrome.storage.sync.set(data);
-      console.log("Data saved to chrome storage:", data);
       return Promise.resolve();
     } else if (typeof localStorage !== "undefined") {
       const key = Object.keys(data)[0] as string;
@@ -112,7 +110,6 @@ export const useMainStore = defineStore("main", () => {
         key,
         typeof value === "string" ? value : JSON.stringify(value)
       );
-      console.log("Data saved to localStorage:", data);
       return Promise.resolve();
     } else {
       console.warn(

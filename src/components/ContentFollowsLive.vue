@@ -1,7 +1,7 @@
 <template>
   <div class="content-follows">
     <div class="content-follows__header">
-      <div class="content-follows__title">Your Follows</div>
+      <div class="content-follows__title">Live Followed Channels</div>
       <div class="content-follows__actions">
         <BaseButton
           size="sm"

@@ -4,7 +4,7 @@
       v-if="twitchStore.fetchFollowedChannelsStatus === 'loading'" />
     <template v-else>
       <div class="content-follows__header">
-        Followed Channels ({{ twitchStore.followedChannels.length }})
+        All Followed Channels ({{ twitchStore.followedChannels.length }})
       </div>
       <ChannelListItem
         v-for="channel in twitchStore.followedChannels"
