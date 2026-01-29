@@ -2,7 +2,7 @@
   <template v-if="accessToken">
     <ContentLoading v-if="mainStore.twitchAuthStatus === 'loading'" />
     <template v-else-if="mainStore.twitchAuthStatus === 'success'">
-      <p>Successfully authenticated with token</p>
+      <p>Successfully logged in with Twitch. You can now close this tab.</p>
     </template>
     <template v-else-if="mainStore.twitchAuthStatus === 'error'">
       <p>Error during authentication. Please try again</p>
@@ -14,7 +14,7 @@
   <template v-else>
     <p>Please log in with Twitch to continue.</p>
     <BaseLink :href="mainStore.authLink"
-      ><BaseButton title="Login with Twitch"
+      ><BaseButton title="Login with Twitch" primary
     /></BaseLink>
   </template>
 </template>

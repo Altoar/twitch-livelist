@@ -15,7 +15,6 @@
 </template>
 <script setup lang="ts">
 import { onBeforeMount } from "vue";
-
 import { useTwitchStore } from "@/stores/twitch";
 import ChannelListItem from "./ChannelListItem.vue";
 import ContentLoading from "./ContentLoading.vue";

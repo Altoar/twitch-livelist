@@ -18,7 +18,6 @@
       <a
         href="#/settings"
         class="sidenav__nav-item"
-        v-if="mainStore.isLoggedIn"
         :class="{
           'sidenav__nav-item--active': props.currentPath === '#/settings'
         }"
@@ -31,12 +30,11 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useMainStore } from "@/stores/main";
-const mainStore = useMainStore();
 
 const props = defineProps<{
   currentPath: string;
 }>();
+
 const nav = ref([
   { name: "Live Followed", icon: "heart", link: "#/followed-live" },
   { name: "Browse", icon: "list", link: "#/browse" },

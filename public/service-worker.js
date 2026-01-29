@@ -24,11 +24,12 @@ function resetData() {
   chrome.storage.session.remove("followedLiveChannels");
   chrome.storage.sync.remove("twitchAccessToken");
   chrome.alarms.clear("fetch-followed-live-channels");
+  chrome.alarms.clear("validate-twitch-token");
+  chrome.action.setBadgeText({ text: "" });
 }
 
 async function init() {
   chrome.action.setBadgeBackgroundColor({ color: "#9146ff" }, () => {});
-
   chrome.action.setBadgeTextColor({ color: "#ffffff" }, () => {});
 
   const isValid = await validateToken();
@@ -145,6 +146,7 @@ async function getFollowedLiveChannels() {
   console.log("Fetching followed live channels...");
   let cursor = null;
   let allLiveChannelsIds = [];
+  allLiveChannelsDetails = {};
 
   do {
     const url = new URL("https://api.twitch.tv/helix/streams/followed");
@@ -192,8 +194,6 @@ async function getFollowedLiveChannels() {
   const numberOfLiveChannels = allLiveChannelsIds.length;
   chrome.action.setBadgeText({ text: numberOfLiveChannels.toString() });
 
-  console.log("Fetched followed live channels:", allLiveChannelsDetails);
-
   // Store the list of live followed channel IDs in session storage
   await chrome.storage.session.set({
     followedLiveChannels: allLiveChannelsIds
@@ -213,13 +213,23 @@ chrome.runtime.onMessageExternal.addListener(async function (request) {
     }
 
     await getTwitchUser(request.data.token);
-    await createInterval();
+
+    // Wait for user data to be stored before fetching followed channels
+    getFollowedLiveChannels();
+    createInterval();
 
     console.log("User data fetched and stored");
   }
 });
 
 chrome.storage.onChanged.addListener(async (changes, namespace) => {
+  // When Access Token has been removed, reset all data
+  if (changes.twitchAccessToken?.newValue === "") {
+    console.log("Twitch Access Token removed, resetting data");
+    resetData();
+    return;
+  }
+
   // Get old and new values of "followedLiveChannels"
   if (changes.followedLiveChannels) {
     const oldChannels = changes.followedLiveChannels.oldValue || [];
@@ -239,15 +249,6 @@ chrome.storage.onChanged.addListener(async (changes, namespace) => {
       return;
     }
 
-    const silentNotifications = await chrome.storage.sync.get([
-      "silentNotifications"
-    ]);
-
-    // Default to true if silentNotifications doesn't exist
-    const isSilent = silentNotifications.silentNotifications ?? true;
-
-    console.log("Silent notification setting:", isSilent);
-
     const disabledNotifications = await chrome.storage.sync.get([
       "disabledNotificationChannelIds"
     ]);
@@ -261,6 +262,17 @@ chrome.storage.onChanged.addListener(async (changes, namespace) => {
         !oldChannels.includes(channelId) &&
         !disabledChannelIds.includes(channelId)
     );
+
+    if (wentLiveChannels.length === 0) {
+      return;
+    }
+
+    const silentNotifications = await chrome.storage.sync.get([
+      "silentNotifications"
+    ]);
+
+    // Default to true if silentNotifications doesn't exist
+    const isSilent = silentNotifications.silentNotifications ?? true;
 
     console.log("Channels that went live:", wentLiveChannels);
 

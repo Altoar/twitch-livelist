@@ -119,7 +119,7 @@ function formatDate(dateString: string) {
     color: var(--text-primary);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
 
   &__partner {

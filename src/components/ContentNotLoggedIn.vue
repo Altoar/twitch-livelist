@@ -21,5 +21,11 @@ const mainStore = useMainStore();
 .content-not-logged-in {
   text-align: center;
   padding: 20px;
+
+  p {
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+  }
 }
 </style>

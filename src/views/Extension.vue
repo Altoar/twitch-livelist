@@ -25,15 +25,14 @@ import { useMainStore } from "@/stores/main";
 const mainStore = useMainStore();
 
 const routes = {
-  "/followed-live": ContentFollowsLive,
-  "/browse": ContentBrowse,
-  "/categories": ContentCategories,
-  "/settings": ContentSettings,
-  "/followed-all": ContentFollowsAll
+  "#/followed-live": ContentFollowsLive,
+  "#/browse": ContentBrowse,
+  "#/categories": ContentCategories,
+  "#/settings": ContentSettings,
+  "#/followed-all": ContentFollowsAll
 };
 
-const defaultRoute = "/followed-live";
-
+const defaultRoute = "#/followed-live";
 const currentPath = ref(window.location.hash);
 
 // Clean query parameters and set initial path
@@ -42,11 +41,14 @@ const cleanPath = (path: string) => path.split("?")[0] || defaultRoute;
 currentPath.value = cleanPath(window.location.hash);
 
 window.addEventListener("hashchange", () => {
-  currentPath.value = cleanPath(window.location.hash);
+  if (currentPath.value === "#/") {
+    window.location.hash = defaultRoute;
+  }
+  currentPath.value = cleanPath(window.location.hash); // If empty redirect to default route
 });
 
 const currentView = computed(() => {
-  const path = currentPath.value.slice(1) || defaultRoute.slice(1);
+  const path = currentPath.value || defaultRoute;
   return routes[path as keyof typeof routes] || routes[defaultRoute];
 });
 </script>
