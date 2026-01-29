@@ -75,6 +75,7 @@ export interface FollowedChannel {
   profileImageUrl: string;
   followedAt: string;
   broadcasterType: string;
+  notificationsEnabled: boolean;
 }
 
 type FetchStatus = "idle" | "loading" | "error" | "success";
@@ -83,6 +84,7 @@ export const useTwitchStore = defineStore("twitch", () => {
   const mainStore = useMainStore();
   const followedLiveChannels = ref<TwitchApiStream[]>([]);
   const followedChannels = ref<FollowedChannel[]>([]);
+  const disabledNotificationChannelIds = ref<string[]>([]);
   const isFollowedChannelsReverseOrder = ref(false);
   const topChannels = ref<TwitchApiStream[]>([]);
   const topChannelsCursor = ref<string | undefined>(undefined);
@@ -274,7 +276,11 @@ export const useTwitchStore = defineStore("twitch", () => {
               userMap[channel.broadcaster_id]?.profile_image_url || "",
             broadcasterType:
               userMap[channel.broadcaster_id]?.broadcaster_type || "",
-            followedAt: channel.followed_at
+            followedAt: channel.followed_at,
+            notificationsEnabled:
+              !disabledNotificationChannelIds.value.includes(
+                channel.broadcaster_id
+              )
           }))
         );
 
@@ -380,6 +386,7 @@ export const useTwitchStore = defineStore("twitch", () => {
     fetchTopChannelsLoadMoreStatus,
     followedChannels,
     fetchTopCategoriesStatus,
+    disabledNotificationChannelIds,
     validateToken,
     getTopChannels,
     getFollowedLiveChannels,

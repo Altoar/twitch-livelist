@@ -34,6 +34,7 @@ async function init() {
   const isValid = await validateToken();
 
   if (isValid) {
+    getFollowedLiveChannels();
     await createInterval();
     console.log("Service worker started and interval created");
   }
@@ -247,10 +248,20 @@ chrome.storage.onChanged.addListener(async (changes, namespace) => {
 
     console.log("Silent notification setting:", isSilent);
 
-    // Determine which channels went live
+    const disabledNotifications = await chrome.storage.sync.get([
+      "disabledNotificationChannelIds"
+    ]);
+
+    const disabledChannelIds =
+      disabledNotifications.disabledNotificationChannelIds || [];
+
+    // Determine which channels went live (by comparing old and new lists) and are not disabled
     const wentLiveChannels = newChannels.filter(
-      (channel) => !oldChannels.includes(channel)
+      (channelId) =>
+        !oldChannels.includes(channelId) &&
+        !disabledChannelIds.includes(channelId)
     );
+
     console.log("Channels that went live:", wentLiveChannels);
 
     wentLiveChannels.forEach((channelId) => {

@@ -55,6 +55,12 @@ onBeforeMount(async () => {
     "silentNotifications"
   );
   mainStore.isNotificationSilent = isNotificationSilent ?? true;
+
+  const disabledNotificationChannelIds = await mainStore.getStorageItem(
+    "disabledNotificationChannelIds"
+  );
+  twitchStore.disabledNotificationChannelIds =
+    disabledNotificationChannelIds || [];
 });
 </script>
 
