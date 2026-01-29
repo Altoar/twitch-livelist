@@ -17,6 +17,7 @@ const props = defineProps<{
   transparent?: boolean;
   primary?: boolean;
   secondary?: boolean;
+  danger?: boolean;
 }>();
 
 const classes = computed(() => {
@@ -27,7 +28,8 @@ const classes = computed(() => {
     "base-button--square": props.square || false,
     "base-button--transparent": props.transparent || false,
     "base-button--primary": props.primary || false,
-    "base-button--secondary": props.secondary || false
+    "base-button--secondary": props.secondary || false,
+    "base-button--danger": props.danger || false
   };
 });
 </script>
@@ -61,6 +63,13 @@ const classes = computed(() => {
     background-color: transparent;
     &:hover {
       background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  &--danger {
+    background-color: var(--button-danger);
+    &:hover {
+      background-color: var(--button-danger-hover);
     }
   }
 

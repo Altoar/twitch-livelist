@@ -11,7 +11,6 @@ async function createInterval() {
   console.log("Creating alarm to fetch followed live channels every minute");
 
   chrome.alarms.create("fetch-followed-live-channels", {
-    delayInMinutes: 1,
     periodInMinutes: 1
   });
 
@@ -219,7 +218,7 @@ chrome.runtime.onMessageExternal.addListener(async function (request) {
   }
 });
 
-chrome.storage.onChanged.addListener((changes, namespace) => {
+chrome.storage.onChanged.addListener(async (changes, namespace) => {
   // Get old and new values of "followedLiveChannels"
   if (changes.followedLiveChannels) {
     const oldChannels = changes.followedLiveChannels.oldValue || [];
@@ -229,6 +228,25 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
       // Initial load, do not send notifications
       return;
     }
+
+    // Check if desktop notifications are enabled
+    const desktopNotifications = await chrome.storage.sync.get([
+      "desktopNotifications"
+    ]);
+
+    if (!desktopNotifications.desktopNotifications) {
+      return;
+    }
+
+    const silentNotifications = await chrome.storage.sync.get([
+      "silentNotifications"
+    ]);
+
+    // Default to true if silentNotifications doesn't exist
+    const isSilent = silentNotifications.silentNotifications ?? true;
+
+    console.log("Silent notification setting:", isSilent);
+
     // Determine which channels went live
     const wentLiveChannels = newChannels.filter(
       (channel) => !oldChannels.includes(channel)
@@ -246,7 +264,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
           iconUrl: channelDetails.thumbnail_url
             .replace("{width}", "70")
             .replace("{height}", "70"),
-          silent: true
+          silent: isSilent
         };
         chrome.notifications.create(null, notificationOptions);
       }

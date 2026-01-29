@@ -2,11 +2,30 @@
   <div class="content-settings">
     <h2>Settings</h2>
     <div class="content-settings__section">
+      <h3>Notifications</h3>
+      <div class="content-settings__notification-item">
+        <span>Enable Desktop Notifications</span>
+        <BaseToggle
+          v-model="mainStore.isDesktopNotificationsEnabled"
+          @update:model-value="
+            mainStore.toggleDesktopNotifications($event as boolean)
+          " />
+      </div>
+      <div class="content-settings__notification-item">
+        <span>Silent Notifications</span>
+        <BaseToggle
+          v-model="mainStore.isNotificationSilent"
+          @update:model-value="
+            mainStore.toggleSilentNotifications($event as boolean)
+          " />
+      </div>
+    </div>
+    <div class="content-settings__section">
       <h3>Connection</h3>
       <BaseButton
-        size="md"
+        size="sm"
         title="Disconnect Twitch"
-        primary
+        danger
         icon="arrow-right-from-bracket"
         @click="mainStore.logoutTwitch()" />
     </div>
@@ -29,6 +48,7 @@
 import { useMainStore } from "@/stores/main";
 import BaseButton from "@/ui/BaseButton.vue";
 import BaseLink from "@/ui/BaseLink.vue";
+import BaseToggle from "@/ui/BaseToggle.vue";
 const mainStore = useMainStore();
 </script>
 
@@ -54,9 +74,18 @@ const mainStore = useMainStore();
     margin-bottom: 10px;
   }
   &__section {
-    margin-top: 20px;
+    margin-top: 15px;
     border-bottom: 1px solid var(--border-primary);
     padding-bottom: 20px;
+  }
+
+  &__notification-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: var(--text-primary);
   }
 
   &__footer {

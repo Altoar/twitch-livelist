@@ -32,6 +32,9 @@ export const useMainStore = defineStore("main", () => {
 
   const twitchData = ref<TwitchData | null>(null);
 
+  const isDesktopNotificationsEnabled = ref<boolean>(true);
+  const isNotificationSilent = ref<boolean>(true);
+
   const twitchAuthStatus = ref<"idle" | "loading" | "error" | "success">(
     "idle"
   );
@@ -139,6 +142,14 @@ export const useMainStore = defineStore("main", () => {
     }
   }
 
+  function toggleDesktopNotifications(status: boolean) {
+    setStorageItem({ desktopNotifications: status });
+  }
+
+  function toggleSilentNotifications(status: boolean) {
+    setStorageItem({ silentNotifications: status });
+  }
+
   function setTwitchData(data: TwitchData | null) {
     twitchData.value = data;
   }
@@ -149,11 +160,15 @@ export const useMainStore = defineStore("main", () => {
     twitchAuthStatus,
     isLoggedIn,
     authLink,
+    isDesktopNotificationsEnabled,
+    isNotificationSilent,
     authenticateTwitch,
     sendChromeMessage,
     setStorageItem,
     getStorageItem,
     setTwitchData,
-    logoutTwitch
+    logoutTwitch,
+    toggleDesktopNotifications,
+    toggleSilentNotifications
   };
 });

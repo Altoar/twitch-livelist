@@ -44,6 +44,17 @@ onBeforeMount(async () => {
     "isFollowedChannelsReverseOrder"
   );
   twitchStore.isFollowedChannelsReverseOrder = !!isFollowedChannelsReverseOrder;
+
+  const isDesktopNotificationsEnabled = await mainStore.getStorageItem(
+    "desktopNotifications"
+  );
+  mainStore.isDesktopNotificationsEnabled =
+    isDesktopNotificationsEnabled ?? true;
+
+  const isNotificationSilent = await mainStore.getStorageItem(
+    "silentNotifications"
+  );
+  mainStore.isNotificationSilent = isNotificationSilent ?? true;
 });
 </script>
 
