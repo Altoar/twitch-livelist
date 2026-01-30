@@ -1,6 +1,6 @@
 {
-  "name": "Hello Extensions",
-  "description": "Base Level Extension",
+  "name": "Twitch Live List",
+  "description": "Browse Twitch live channels and categories in a simple list format. Get notified when your followed channels go live!",
   "version": "1.0",
   "manifest_version": 3,
   "action": {

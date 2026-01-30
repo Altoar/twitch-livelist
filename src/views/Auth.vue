@@ -1,22 +1,24 @@
 <template>
-  <template v-if="accessToken">
-    <ContentLoading v-if="mainStore.twitchAuthStatus === 'loading'" />
-    <template v-else-if="mainStore.twitchAuthStatus === 'success'">
-      <p>Successfully logged in with Twitch. You can now close this tab.</p>
+  <div class="auth-view">
+    <template v-if="accessToken">
+      <ContentLoading v-if="mainStore.twitchAuthStatus === 'loading'" />
+      <template v-else-if="mainStore.twitchAuthStatus === 'success'">
+        <p>Successfully logged in with Twitch. You can now close this tab.</p>
+      </template>
+      <template v-else-if="mainStore.twitchAuthStatus === 'error'">
+        <p>Error during authentication. Please try again</p>
+      </template>
     </template>
-    <template v-else-if="mainStore.twitchAuthStatus === 'error'">
+    <template v-else-if="authError">
       <p>Error during authentication. Please try again</p>
     </template>
-  </template>
-  <template v-else-if="authError">
-    <p>Error during authentication. Please try again</p>
-  </template>
-  <template v-else>
-    <p>Please log in with Twitch to continue.</p>
-    <BaseLink :href="mainStore.authLink"
-      ><BaseButton title="Login with Twitch" primary
-    /></BaseLink>
-  </template>
+    <template v-else>
+      <p>Please log in with Twitch to continue.</p>
+      <BaseLink :href="mainStore.authLink"
+        ><BaseButton title="Login with Twitch" primary
+      /></BaseLink>
+    </template>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -44,3 +46,16 @@ onBeforeMount(() => {
   }
 });
 </script>
+
+<style scoped lang="scss">
+.auth-view {
+  padding: 20px;
+  text-align: center;
+
+  p {
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+  }
+}
+</style>

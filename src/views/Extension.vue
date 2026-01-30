@@ -59,7 +59,7 @@ const currentView = computed(() => {
   height: 100%;
   min-height: 200px;
   width: 450px;
-  max-height: 500px;
+  max-height: 550px;
 }
 .content-area {
   padding-top: 5px;

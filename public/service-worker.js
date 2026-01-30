@@ -289,7 +289,10 @@ chrome.storage.onChanged.addListener(async (changes, namespace) => {
             .replace("{height}", "70"),
           silent: isSilent
         };
-        chrome.notifications.create(null, notificationOptions);
+        chrome.notifications.create(
+          `${channelDetails.user_login}-${Date.now()}`,
+          notificationOptions
+        );
       }
     });
   }
@@ -311,4 +314,11 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "validate-twitch-token") {
     validateToken();
   }
+});
+
+chrome.notifications.onClicked.addListener((notificationId) => {
+  // Open Twitch channel page when notification is clicked
+  const channelLogin = notificationId.split("-")[0];
+  const twitchUrl = `https://www.twitch.tv/${channelLogin}`;
+  chrome.tabs.create({ url: twitchUrl });
 });
