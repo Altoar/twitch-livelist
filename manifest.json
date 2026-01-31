@@ -13,7 +13,10 @@
     "128": "icons/128.png"
   },
   "externally_connectable": {
-    "matches": ["http://localhost:5173/*"]
+    "matches": [
+      "http://localhost:5173/*",
+      "https://altoar.github.io/twitch-livelist/*"
+    ]
   },
   "permissions": ["storage", "notifications", "alarms"],
   "background": {
