@@ -16,20 +16,20 @@ const mainStore = useMainStore();
 .top-bar {
   background-color: var(--background-primary);
   color: var(--text-primary);
-  padding: 6px;
+  padding: 4px 6px;
   text-align: center;
   border-bottom: 1px solid var(--border-primary);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 14px;
 
   .title {
-    font-size: 16px;
     font-weight: bold;
   }
-
   .user {
-    font-size: 14px;
+    font-size: 12px;
+    color: var(--text-secondary);
   }
 }
 </style>
