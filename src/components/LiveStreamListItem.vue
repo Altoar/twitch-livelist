@@ -90,6 +90,23 @@ function calculateLiveDuration(startedAt: string) {
     width: 130px;
     background: var(--background-secondary);
     height: 100%;
+    background: linear-gradient(
+      90deg,
+      var(--background-secondary) 25%,
+      var(--background-primary) 50%,
+      var(--background-secondary) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton 0.85s ease-in-out infinite;
+
+    @keyframes skeleton {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
 
     img {
       width: 100%;
