@@ -38,7 +38,7 @@
         !twitchStore.followedLiveChannels.length &&
         twitchStore.fetchFollowedChannelsStatus === 'success'
       ">
-      You are not following any channels. Go follow some streamers on Twitch!
+      No followed channels are live right now.
     </div>
     <div
       class="content-follows__empty"

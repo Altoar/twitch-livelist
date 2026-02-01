@@ -1,42 +1,11 @@
-# vue-project
+# Twitch Live List Chrome Extension
 
-This template should help get you started developing with Vue 3 in Vite.
+Connect your Twitch account with this browser extension to view your followed Twitch channels or current top live streams in a compact list format. Get a notification when your followed channels go live. If you want you can disable notifications completely or just for individual channels.
 
-## Recommended IDE Setup
+[Add to Chrome](https://chromewebstore.google.com/detail/maaiefijifagojnaoihjfpojeepgdjkk)
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Screenshots
 
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
+![Follows and top channels](./docs/store1.png)
+![Top games and game directory](./docs/store2.png)
+![All followed channels and settings](./docs/store3.png)
