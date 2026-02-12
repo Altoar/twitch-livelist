@@ -16,20 +16,22 @@ import { computed, ref } from "vue";
 import TopBar from "../components/TopBar.vue";
 import SideNav from "../components/SideNav.vue";
 import ContentFollowsLive from "@/components/ContentFollowsLive.vue";
-import ContentFollowsAll from "@/components/ContentFollowsAll.vue";
+import ContentChannelsManagement from "@/components/ContentChannelsManagement.vue";
 import ContentBrowse from "@/components/ContentBrowse.vue";
 import ContentCategories from "@/components/ContentCategories.vue";
 import ContentNotLoggedIn from "@/components/ContentNotLoggedIn.vue";
 import ContentSettings from "@/components/ContentSettings.vue";
+import ContentFavorites from "@/components/ContentFavorites.vue";
 import { useMainStore } from "@/stores/main";
 const mainStore = useMainStore();
 
 const routes = {
   "#/followed-live": ContentFollowsLive,
+  "#/favorites": ContentFavorites,
   "#/browse": ContentBrowse,
   "#/categories": ContentCategories,
   "#/settings": ContentSettings,
-  "#/followed-all": ContentFollowsAll
+  "#/followed-all": ContentChannelsManagement
 };
 
 const defaultRoute = "#/followed-live";

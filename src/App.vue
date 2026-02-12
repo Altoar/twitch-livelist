@@ -64,6 +64,15 @@ onBeforeMount(async () => {
   );
   twitchStore.disabledNotificationChannelIds =
     disabledNotificationChannelIds || [];
+
+  const favoriteChannelIds =
+    await mainStore.getStorageItem("favoriteChannelIds");
+  twitchStore.favoriteChannelIds = new Set(favoriteChannelIds || []);
+
+  const isFavoriteChannelsReverseOrder = await mainStore.getStorageItem(
+    "isFavoriteChannelsReverseOrder"
+  );
+  twitchStore.isFavoriteChannelsReverseOrder = !!isFavoriteChannelsReverseOrder;
 });
 </script>
 

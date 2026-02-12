@@ -37,6 +37,7 @@ const props = defineProps<{
 
 const nav = ref([
   { name: "Live Followed", icon: "heart", link: "#/followed-live" },
+  { name: "Favorites", icon: "star", link: "#/favorites" },
   { name: "Browse", icon: "list", link: "#/browse" },
   { name: "Categories", icon: "gamepad", link: "#/categories" },
   { name: "All Followed", icon: "address-book", link: "#/followed-all" }

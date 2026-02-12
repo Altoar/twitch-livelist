@@ -11,8 +11,11 @@ import {
   faRotateLeft,
   faGear,
   faAddressBook,
-  faCircleCheck
+  faCircleCheck,
+  faStar
 } from "@fortawesome/free-solid-svg-icons";
+
+import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
 
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 
@@ -32,7 +35,9 @@ library.add(
   faRotateLeft,
   faGear,
   faAddressBook,
-  faCircleCheck
+  faCircleCheck,
+  faStar,
+  faStarRegular
 );
 
 export default FontAwesomeIcon;

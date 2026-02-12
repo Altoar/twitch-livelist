@@ -98,6 +98,12 @@ export const useTwitchStore = defineStore("twitch", () => {
   const fetchTopChannelsStatus = ref<FetchStatus>("idle");
   const fetchTopChannelsLoadMoreStatus = ref<FetchStatus>("idle");
   const fetchTopCategoriesStatus = ref<FetchStatus>("idle");
+  const fetchFavoritedLiveChannelsStatus = ref<FetchStatus>("idle");
+
+  const favoriteChannelIds = ref<Set<string>>(new Set());
+  const favoriteLiveChannels = ref<TwitchApiStream[]>([]);
+  const favoriteChannels = ref<FollowedChannel[]>([]);
+  const isFavoriteChannelsReverseOrder = ref(false);
 
   async function validateToken(): Promise<boolean> {
     const mainStore = useMainStore();
@@ -372,6 +378,119 @@ export const useTwitchStore = defineStore("twitch", () => {
     }
   }
 
+  async function addChannelToFavorites(channelId: string) {
+    if (favoriteChannelIds.value.size >= 100) {
+      console.warn("Maximum of 100 favorite channels reached");
+      return;
+    }
+
+    favoriteChannelIds.value.add(channelId);
+
+    mainStore.setStorageItem({
+      favoriteChannelIds: Array.from(favoriteChannelIds.value)
+    });
+  }
+
+  async function removeChannelFromFavorites(channelId: string) {
+    favoriteChannelIds.value.delete(channelId);
+
+    // Remove the channel from the favoriteLiveChannels list if it's there
+    favoriteLiveChannels.value = favoriteLiveChannels.value.filter(
+      (channel) => channel.user_id !== channelId
+    );
+
+    mainStore.setStorageItem({
+      favoriteChannelIds: Array.from(favoriteChannelIds.value)
+    });
+  }
+
+  async function fetchFavoritedLiveChannels() {
+    if (
+      favoriteChannelIds.value.size === 0 ||
+      favoriteChannelIds.value.size > 100
+    ) {
+      return;
+    }
+
+    try {
+      fetchFavoritedLiveChannelsStatus.value = "loading";
+
+      const channelIds = Array.from(favoriteChannelIds.value);
+      const params = new URLSearchParams();
+      channelIds.forEach((id) => params.append("user_id", id));
+      params.append("first", "100");
+
+      const response = await callApi<{ data: TwitchApiStream[] }>(
+        "/streams",
+        "GET",
+        {
+          params: params
+        }
+      );
+
+      favoriteLiveChannels.value = isFavoriteChannelsReverseOrder.value
+        ? response.data.reverse()
+        : response.data;
+
+      fetchFavoritedLiveChannelsStatus.value = "success";
+      return response.data;
+    } catch (error) {
+      fetchFavoritedLiveChannelsStatus.value = "error";
+      console.error("Error fetching favorited channels:", error);
+      return [];
+    }
+  }
+
+  function reverseFavoriteChannelsOrder(reverse: boolean) {
+    isFavoriteChannelsReverseOrder.value = reverse;
+    favoriteLiveChannels.value = favoriteLiveChannels.value.reverse();
+
+    mainStore.setStorageItem({
+      isFavoriteChannelsReverseOrder: isFavoriteChannelsReverseOrder.value
+    });
+  }
+
+  function fetchFavoritedChannels() {
+    if (favoriteChannelIds.value.size === 0) {
+      favoriteChannels.value = [];
+      return;
+    }
+
+    const allChannels: FollowedChannel[] = [];
+    const channelIds = Array.from(favoriteChannelIds.value);
+    const userResponse = callApi<{ data: TwitchUserApiResponse[] }>(
+      "/users",
+      "GET",
+      {
+        params: {
+          id: channelIds
+        }
+      }
+    );
+
+    userResponse.then((response) => {
+      const userMap: Record<string, TwitchUserApiResponse> = {};
+      response.data.forEach((user) => {
+        userMap[user.id] = user;
+      });
+
+      allChannels.push(
+        ...response.data.map((user) => ({
+          id: user.id,
+          login: user.login,
+          displayName: user.display_name,
+          profileImageUrl: user.profile_image_url,
+          broadcasterType: user.broadcaster_type,
+          followedAt: "", // No followedAt for favorited channels
+          notificationsEnabled: !disabledNotificationChannelIds.value.includes(
+            user.id
+          )
+        }))
+      );
+      favoriteChannels.value = allChannels;
+    });
+  }
+
   return {
     topChannels,
     followedLiveChannels,
@@ -385,6 +504,11 @@ export const useTwitchStore = defineStore("twitch", () => {
     followedChannels,
     fetchTopCategoriesStatus,
     disabledNotificationChannelIds,
+    favoriteChannelIds,
+    favoriteLiveChannels,
+    fetchFavoritedLiveChannelsStatus,
+    isFavoriteChannelsReverseOrder,
+    favoriteChannels,
     validateToken,
     getTopChannels,
     getFollowedLiveChannels,
@@ -392,6 +516,10 @@ export const useTwitchStore = defineStore("twitch", () => {
     reverseFollowedChannelsOrder,
     getTopCategories,
     resetTopChannelsCategory,
-    getFollowedChannels
+    getFollowedChannels,
+    addChannelToFavorites,
+    removeChannelFromFavorites,
+    fetchFavoritedLiveChannels,
+    reverseFavoriteChannelsOrder
   };
 });
