@@ -107,6 +107,9 @@ export const useTwitchStore = defineStore("twitch", () => {
 
   async function validateToken(): Promise<boolean> {
     const mainStore = useMainStore();
+
+    const twitchData = await mainStore.getStorageItem("twitchData");
+
     try {
       const response = await axios.get("https://id.twitch.tv/oauth2/validate", {
         headers: {
@@ -115,7 +118,7 @@ export const useTwitchStore = defineStore("twitch", () => {
       });
 
       mainStore.twitchData = {
-        ...mainStore.twitchData,
+        ...twitchData,
         clientId: response.data.client_id,
         expiresIn: response.data.expires_in,
         scopes: response.data.scopes
@@ -173,7 +176,7 @@ export const useTwitchStore = defineStore("twitch", () => {
     });
   }
 
-  async function getFollowedLiveChannels() {
+  async function fetchFollowedLiveChannels() {
     if (!mainStore.isLoggedIn) {
       console.warn(
         "User is not logged in to Twitch, cannot fetch followed channels"
@@ -271,7 +274,7 @@ export const useTwitchStore = defineStore("twitch", () => {
           userMap[user.id] = user;
         });
 
-        allChannels.push(
+        followedChannels.value.push(
           ...responseFollowedChannels.data.map((channel) => ({
             id: channel.broadcaster_id,
             login: channel.broadcaster_login,
@@ -297,7 +300,6 @@ export const useTwitchStore = defineStore("twitch", () => {
     } while (cursorFollowedChannels);
 
     fetchFollowedChannelsStatus.value = "success";
-    followedChannels.value = allChannels;
   }
 
   async function getTopChannels({
@@ -511,7 +513,7 @@ export const useTwitchStore = defineStore("twitch", () => {
     favoriteChannels,
     validateToken,
     getTopChannels,
-    getFollowedLiveChannels,
+    fetchFollowedLiveChannels,
     getTwitchUser,
     reverseFollowedChannelsOrder,
     getTopCategories,

@@ -3,7 +3,7 @@
   <div class="main-content">
     <SideNav :current-path="currentPath" />
     <div class="content-area" v-if="mainStore.isLoggedIn">
-      <KeepAlive>
+      <KeepAlive include="ContentChannelsManagement">
         <component :is="currentView" />
       </KeepAlive>
     </div>

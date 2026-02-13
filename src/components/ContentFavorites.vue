@@ -3,10 +3,6 @@
     <div class="content-favorites__header">
       <div class="content-favorites__title">
         <span>Favorite Channels</span>
-        <span class="content-favorites__count">
-          ({{ twitchStore.favoriteLiveChannels.length }} /
-          {{ twitchStore.favoriteChannelIds.size }})
-        </span>
       </div>
       <div class="content-favorites__actions">
         <BaseButton

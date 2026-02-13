@@ -11,8 +11,18 @@
         }"
         v-for="item in nav"
         :key="item.name"
-        ><Icon :icon="item.icon" size="lg"
-      /></a>
+        ><Icon :icon="item.icon" size="lg" />
+        <div
+          class="sidenav__live-count-badge"
+          v-if="item.link === '#/followed-live'">
+          {{ twitchStore.followedLiveChannels.length }}
+        </div>
+        <div
+          class="sidenav__live-count-badge"
+          v-else-if="item.link === '#/favorites'">
+          {{ twitchStore.favoriteLiveChannels.length }}
+        </div>
+      </a>
     </div>
     <div class="sidenav__bottomnav">
       <a
@@ -30,6 +40,8 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useTwitchStore } from "@/stores/twitch";
+const twitchStore = useTwitchStore();
 
 const props = defineProps<{
   currentPath: string;
@@ -74,12 +86,31 @@ const nav = ref([
     text-align: center;
     text-decoration: none;
     width: 100%;
+    position: relative;
 
     &:hover,
     &--active {
       background-color: var(--background-secondary);
       color: var(--accent-color);
     }
+  }
+
+  &__live-count-badge {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    font-weight: bold;
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 12px;
+    padding: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    min-width: 10px;
+    text-align: center;
+    height: 10px;
   }
 }
 </style>

@@ -23,7 +23,7 @@
     </template>
     <template v-else-if="activeTab === 'favorited'">
       <div class="content-channels-management__header">
-        Favorited Channels ({{ twitchStore.favoriteChannelIds.size }})
+        Favorited Channels ({{ twitchStore.favoriteChannelIds.size }}/100)
       </div>
       <ContentLoading
         v-if="twitchStore.fetchFavoriteChannelsStatus === 'loading'" />

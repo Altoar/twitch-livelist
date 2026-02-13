@@ -35,7 +35,7 @@ async function init() {
   const isValid = await validateToken();
 
   if (isValid) {
-    getFollowedLiveChannels();
+    fetchFollowedLiveChannels();
     createInterval();
   }
 }
@@ -123,7 +123,7 @@ async function getTwitchUser(token) {
   return data;
 }
 
-async function getFollowedLiveChannels() {
+async function fetchFollowedLiveChannels() {
   const twitchAccessToken = await chrome.storage.sync.get([
     "twitchAccessToken"
   ]);
@@ -211,7 +211,7 @@ chrome.runtime.onMessageExternal.addListener(async function (request) {
     await getTwitchUser(request.data.token);
 
     // Wait for user data to be stored before fetching followed channels
-    getFollowedLiveChannels();
+    fetchFollowedLiveChannels();
     createInterval();
 
     console.log("User data fetched and stored");
@@ -302,7 +302,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "fetch-followed-live-channels") {
-    getFollowedLiveChannels();
+    fetchFollowedLiveChannels();
   }
 
   if (alarm.name === "validate-twitch-token") {
