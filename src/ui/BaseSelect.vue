@@ -83,6 +83,7 @@ onUnmounted(() => {
 
   &__selected {
     padding: 2px;
+    padding-left: 4px;
     border: 1px solid var(--border-primary);
     border-radius: 5px;
     background-color: var(--background-select);

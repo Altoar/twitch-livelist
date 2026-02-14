@@ -34,6 +34,7 @@ export const useMainStore = defineStore("main", () => {
 
   const isDesktopNotificationsEnabled = ref<boolean>(true);
   const isNotificationSilent = ref<boolean>(true);
+  const defaultPage = ref<"#/followed-live" | "#/favorites">("#/followed-live");
 
   const twitchAuthStatus = ref<"idle" | "loading" | "error" | "success">(
     "idle"
@@ -154,6 +155,11 @@ export const useMainStore = defineStore("main", () => {
     twitchData.value = data;
   }
 
+  function setDefaultPage(page: "#/followed-live" | "#/favorites") {
+    defaultPage.value = page;
+    setStorageItem({ defaultPage: page });
+  }
+
   return {
     twitchData,
     twitchAccessToken,
@@ -162,6 +168,7 @@ export const useMainStore = defineStore("main", () => {
     authLink,
     isDesktopNotificationsEnabled,
     isNotificationSilent,
+    defaultPage,
     authenticateTwitch,
     sendChromeMessage,
     setStorageItem,
@@ -169,6 +176,7 @@ export const useMainStore = defineStore("main", () => {
     setTwitchData,
     logoutTwitch,
     toggleDesktopNotifications,
-    toggleSilentNotifications
+    toggleSilentNotifications,
+    setDefaultPage
   };
 });

@@ -3,7 +3,7 @@
     <h2>Settings</h2>
     <div class="content-settings__section">
       <h3>Notifications</h3>
-      <div class="content-settings__notification-item">
+      <div class="content-settings__setting-item">
         <span>Enable Desktop Notifications</span>
         <BaseToggle
           v-model="mainStore.isDesktopNotificationsEnabled"
@@ -11,13 +11,28 @@
             mainStore.toggleDesktopNotifications($event as boolean)
           " />
       </div>
-      <div class="content-settings__notification-item">
+      <div class="content-settings__setting-item">
         <span>Silent Notifications</span>
         <BaseToggle
           v-model="mainStore.isNotificationSilent"
           @update:model-value="
             mainStore.toggleSilentNotifications($event as boolean)
           " />
+      </div>
+    </div>
+    <div class="content-settings__section">
+      <h3>Other</h3>
+      <div class="content-settings__setting-item">
+        <span>Default Page</span>
+        <BaseSelect
+          v-model="mainStore.defaultPage"
+          :options="pages"
+          @update:model-value="
+            mainStore.setDefaultPage(
+              $event as '#/followed-live' | '#/favorites'
+            )
+          "
+          style="width: 150px" />
       </div>
     </div>
     <div class="content-settings__section">
@@ -49,7 +64,13 @@ import { useMainStore } from "@/stores/main";
 import BaseButton from "@/ui/BaseButton.vue";
 import BaseLink from "@/ui/BaseLink.vue";
 import BaseToggle from "@/ui/BaseToggle.vue";
+import BaseSelect from "@/ui/BaseSelect.vue";
 const mainStore = useMainStore();
+
+const pages = [
+  { label: "Live Followed", value: "#/followed-live" },
+  { label: "Favorites", value: "#/favorites" }
+];
 </script>
 
 <style lang="scss" scoped>
@@ -74,12 +95,11 @@ const mainStore = useMainStore();
     margin-bottom: 10px;
   }
   &__section {
-    margin-top: 15px;
     border-bottom: 1px solid var(--border-primary);
     padding-bottom: 20px;
   }
 
-  &__notification-item {
+  &__setting-item {
     display: flex;
     justify-content: space-between;
     align-items: center;

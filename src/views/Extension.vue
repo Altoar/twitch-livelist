@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onBeforeMount } from "vue";
 import TopBar from "../components/TopBar.vue";
 import SideNav from "../components/SideNav.vue";
 import ContentFollowsLive from "@/components/ContentFollowsLive.vue";
@@ -42,24 +42,28 @@ const routes = {
   "#/directory": ContentChannelsManagement
 };
 
-const defaultRoute = "#/followed-live";
+onBeforeMount(async () => {
+  const defaultPage = await mainStore.getStorageItem("defaultPage");
+  mainStore.defaultPage = defaultPage || "#/followed-live";
+});
+
 const currentPath = ref(window.location.hash);
 
 // Clean query parameters and set initial path
-const cleanPath = (path: string) => path.split("?")[0] || defaultRoute;
+const cleanPath = (path: string) => path.split("?")[0] || mainStore.defaultPage;
 
 currentPath.value = cleanPath(window.location.hash);
 
 window.addEventListener("hashchange", () => {
   if (currentPath.value === "#/") {
-    window.location.hash = defaultRoute;
+    window.location.hash = mainStore.defaultPage;
   }
   currentPath.value = cleanPath(window.location.hash); // If empty redirect to default route
 });
 
 const currentView = computed(() => {
-  const path = currentPath.value || defaultRoute;
-  return routes[path as keyof typeof routes] || routes[defaultRoute];
+  const path = currentPath.value || mainStore.defaultPage;
+  return routes[path as keyof typeof routes] || routes[mainStore.defaultPage];
 });
 </script>
 
