@@ -21,7 +21,7 @@ async function createInterval() {
 
 function resetData() {
   chrome.storage.sync.remove("twitchData");
-  chrome.storage.session.remove("followedLiveChannels");
+  chrome.storage.session.remove("liveChannelIdsForNotifications");
   chrome.storage.sync.remove("twitchAccessToken");
   chrome.alarms.clear("fetch-followed-live-channels");
   chrome.alarms.clear("validate-twitch-token");
@@ -35,7 +35,7 @@ async function init() {
   const isValid = await validateToken();
 
   if (isValid) {
-    fetchFollowedLiveChannels();
+    fetchLiveChannels();
     createInterval();
   }
 }
@@ -123,7 +123,7 @@ async function getTwitchUser(token) {
   return data;
 }
 
-async function fetchFollowedLiveChannels() {
+async function fetchLiveChannels() {
   const twitchAccessToken = await chrome.storage.sync.get([
     "twitchAccessToken"
   ]);
@@ -139,11 +139,20 @@ async function fetchFollowedLiveChannels() {
     return;
   }
 
-  console.log("Fetching followed live channels...");
   let cursor = null;
-  let allLiveChannelsIds = [];
+  let allLiveChannelsIds = new Set();
+  let channelsForBadgeNumbers = new Set();
   allLiveChannelsDetails = {};
 
+  const notificationChannelsType = (await chrome.storage.sync.get([
+    "notificationChannelsType"
+  ])) || { notificationChannelsType: "followed-only" };
+
+  const badgeLiveChannelsNumberType = (await chrome.storage.sync.get([
+    "badgeLiveChannelsNumberType"
+  ])) || { badgeLiveChannelsNumberType: "followed-only" };
+
+  // Fetch followed live channels with pagination (100 channels per request) until there are no more pages left
   do {
     const url = new URL("https://api.twitch.tv/helix/streams/followed");
     url.searchParams.append("first", "100");
@@ -174,25 +183,85 @@ async function fetchFollowedLiveChannels() {
 
     const data = await response.json();
 
-    // An array of user IDs of live followed channels
-    allLiveChannelsIds = allLiveChannelsIds.concat(
-      data.data.map((channel) => channel.user_id)
-    );
-
-    // Store detailed info about live followed channels in a global variable
+    // A Set of user IDs of live followed channels
     data.data.forEach((channel) => {
-      allLiveChannelsDetails[channel.user_id] = channel;
+      // Channels list for desktop notifications, based on user settings (followed-only, favorited-only, followed-and-favorited)
+      if (
+        notificationChannelsType.notificationChannelsType === "followed-only" ||
+        notificationChannelsType.notificationChannelsType ===
+          "followed-and-favorited"
+      ) {
+        allLiveChannelsIds.add(channel.user_id);
+        allLiveChannelsDetails[channel.user_id] = channel;
+      }
+
+      if (
+        badgeLiveChannelsNumberType.badgeLiveChannelsNumberType ===
+          "followed-only" ||
+        badgeLiveChannelsNumberType.badgeLiveChannelsNumberType ===
+          "followed-and-favorited"
+      ) {
+        channelsForBadgeNumbers.add(channel.user_id);
+      }
     });
 
     cursor = data.pagination.cursor;
   } while (cursor);
 
-  const numberOfLiveChannels = allLiveChannelsIds.length;
+  // Fetch Favorite Channels from storage and add them to the list of live channels if they are live, even if they are not followed
+  const favoriteChannelIds = await chrome.storage.sync.get([
+    "favoriteChannelIds"
+  ]);
+  if (favoriteChannelIds.favoriteChannelIds) {
+    const params = new URLSearchParams();
+    favoriteChannelIds.favoriteChannelIds.forEach((id) =>
+      params.append("user_id", id)
+    );
+    params.append("first", "100");
+
+    const url = `https://api.twitch.tv/helix/streams?${params.toString()}`;
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${twitchAccessToken.twitchAccessToken}`,
+        "Client-Id": twitchData.twitchData.clientId
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      data.data.forEach((channel) => {
+        // Channels list for desktop notifications, based on user settings (followed-only, favorited-only, followed-and-favorited)
+        if (
+          notificationChannelsType.notificationChannelsType ===
+            "favorited-only" ||
+          notificationChannelsType.notificationChannelsType ===
+            "followed-and-favorited"
+        ) {
+          allLiveChannelsIds.add(channel.user_id);
+          allLiveChannelsDetails[channel.user_id] = channel;
+        }
+
+        if (
+          badgeLiveChannelsNumberType.badgeLiveChannelsNumberType ===
+            "favorited-only" ||
+          badgeLiveChannelsNumberType.badgeLiveChannelsNumberType ===
+            "followed-and-favorited"
+        ) {
+          channelsForBadgeNumbers.add(channel.user_id);
+        }
+      });
+    } else {
+      console.warn("Failed to fetch favorite channels", response.error);
+    }
+  }
+
+  const numberOfLiveChannels = channelsForBadgeNumbers.size;
   chrome.action.setBadgeText({ text: numberOfLiveChannels.toString() });
 
   // Store the list of live followed channel IDs in session storage
   await chrome.storage.session.set({
-    followedLiveChannels: allLiveChannelsIds
+    liveChannelIdsForNotifications: Array.from(allLiveChannelsIds)
   });
 }
 
@@ -211,7 +280,7 @@ chrome.runtime.onMessageExternal.addListener(async function (request) {
     await getTwitchUser(request.data.token);
 
     // Wait for user data to be stored before fetching followed channels
-    fetchFollowedLiveChannels();
+    fetchLiveChannels();
     createInterval();
 
     console.log("User data fetched and stored");
@@ -226,10 +295,10 @@ chrome.storage.onChanged.addListener(async (changes, namespace) => {
     return;
   }
 
-  // Get old and new values of "followedLiveChannels"
-  if (changes.followedLiveChannels) {
-    const oldChannels = changes.followedLiveChannels.oldValue || [];
-    const newChannels = changes.followedLiveChannels.newValue || [];
+  // Get old and new values of "liveChannelIdsForNotifications"
+  if (changes.liveChannelIdsForNotifications) {
+    const oldChannels = changes.liveChannelIdsForNotifications.oldValue || [];
+    const newChannels = changes.liveChannelIdsForNotifications.newValue || [];
 
     if (oldChannels.length === 0) {
       // Initial load, do not send notifications
@@ -302,7 +371,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "fetch-followed-live-channels") {
-    fetchFollowedLiveChannels();
+    fetchLiveChannels();
   }
 
   if (alarm.name === "validate-twitch-token") {

@@ -35,10 +35,17 @@ export const useMainStore = defineStore("main", () => {
   const isDesktopNotificationsEnabled = ref<boolean>(true);
   const isNotificationSilent = ref<boolean>(true);
   const defaultPage = ref<"#/followed-live" | "#/favorites">("#/followed-live");
+  const badgeLiveChannelsNumberType = ref<
+    "followed-only" | "favorited-only" | "followed-and-favorited"
+  >("followed-only");
 
   const twitchAuthStatus = ref<"idle" | "loading" | "error" | "success">(
     "idle"
   );
+
+  const notificationChannelsType = ref<
+    "followed-only" | "favorited-only" | "followed-and-favorited"
+  >("followed-only");
 
   const isLoggedIn = computed(
     () => twitchData.value !== null && twitchData.value.user?.id
@@ -160,6 +167,20 @@ export const useMainStore = defineStore("main", () => {
     setStorageItem({ defaultPage: page });
   }
 
+  function setbadgeLiveChannelsNumberType(
+    option: "followed-only" | "favorited-only" | "followed-and-favorited"
+  ) {
+    badgeLiveChannelsNumberType.value = option;
+    setStorageItem({ badgeLiveChannelsNumberType: option });
+  }
+
+  function setNotificationChannelsType(
+    option: "followed-only" | "favorited-only" | "followed-and-favorited"
+  ) {
+    notificationChannelsType.value = option;
+    setStorageItem({ notificationChannelsType: option });
+  }
+
   return {
     twitchData,
     twitchAccessToken,
@@ -169,6 +190,8 @@ export const useMainStore = defineStore("main", () => {
     isDesktopNotificationsEnabled,
     isNotificationSilent,
     defaultPage,
+    badgeLiveChannelsNumberType,
+    notificationChannelsType,
     authenticateTwitch,
     sendChromeMessage,
     setStorageItem,
@@ -177,6 +200,8 @@ export const useMainStore = defineStore("main", () => {
     logoutTwitch,
     toggleDesktopNotifications,
     toggleSilentNotifications,
-    setDefaultPage
+    setDefaultPage,
+    setbadgeLiveChannelsNumberType,
+    setNotificationChannelsType
   };
 });

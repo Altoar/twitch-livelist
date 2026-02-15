@@ -72,6 +72,18 @@ onBeforeMount(async () => {
     "isFavoriteChannelsReverseOrder"
   );
   twitchStore.isFavoriteChannelsReverseOrder = !!isFavoriteChannelsReverseOrder;
+
+  const badgeLiveChannelsNumberType = await mainStore.getStorageItem(
+    "badgeLiveChannelsNumberType"
+  );
+  mainStore.badgeLiveChannelsNumberType =
+    badgeLiveChannelsNumberType || "followed-only";
+
+  const notificationChannelsType = await mainStore.getStorageItem(
+    "notificationChannelsType"
+  );
+  mainStore.notificationChannelsType =
+    notificationChannelsType || "followed-only";
 });
 </script>
 

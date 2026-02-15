@@ -1,5 +1,7 @@
 <template>
-  <div :class="['base-select', { 'base-select--open': isOpen }]">
+  <div
+    ref="selectElement"
+    :class="['base-select', { 'base-select--open': isOpen }]">
     <div class="base-select__selected" @click="toggleOpen">
       <span>{{ selectedOptionLabel }}</span>
       <i class="icon-chevron-down"></i>
@@ -24,6 +26,7 @@ const props = defineProps<{
 
 const model = defineModel<string | null>("modelValue");
 
+const selectElement = ref<HTMLElement | null>(null);
 const isOpen = ref(false);
 const selectedOption = ref(
   props.options.find((opt) => opt.value === model.value) || null
@@ -54,8 +57,7 @@ watch(
 // Close dropdown when clicking outside
 function handleClickOutside(event: Event) {
   const target = event.target as HTMLElement;
-  const selectElement = document.querySelector(".base-select");
-  if (selectElement && !selectElement.contains(target)) {
+  if (selectElement.value && !selectElement.value.contains(target)) {
     isOpen.value = false;
   }
 }
@@ -80,6 +82,7 @@ onUnmounted(() => {
   width: 100px;
   font-family: Arial, sans-serif;
   font-size: 14px;
+  user-select: none;
 
   &__selected {
     padding: 2px;
@@ -116,6 +119,11 @@ onUnmounted(() => {
   &__option {
     padding: 2px;
     cursor: pointer;
+    border-bottom: 1px solid var(--border-secondary);
+
+    &:last-child {
+      border-bottom: none;
+    }
 
     &:hover {
       background-color: var(--background-select-hover);
