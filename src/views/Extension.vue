@@ -42,23 +42,20 @@ const routes = {
   "#/directory": ContentChannelsManagement
 };
 
+const currentPath = ref(window.location.hash);
+
+const cleanPath = (path: string) => path.split("?")[0] || mainStore.defaultPage;
+
+const handleHashChange = () => {
+  const newHash = window.location.hash || mainStore.defaultPage;
+  currentPath.value = cleanPath(newHash);
+};
+
 onBeforeMount(async () => {
   const defaultPage = await mainStore.getStorageItem("defaultPage");
   mainStore.defaultPage = defaultPage || "#/followed-live";
-});
-
-const currentPath = ref(window.location.hash);
-
-// Clean query parameters and set initial path
-const cleanPath = (path: string) => path.split("?")[0] || mainStore.defaultPage;
-
-currentPath.value = cleanPath(window.location.hash);
-
-window.addEventListener("hashchange", () => {
-  if (currentPath.value === "#/") {
-    window.location.hash = mainStore.defaultPage;
-  }
-  currentPath.value = cleanPath(window.location.hash); // If empty redirect to default route
+  currentPath.value = cleanPath(window.location.hash);
+  window.addEventListener("hashchange", handleHashChange);
 });
 
 const currentView = computed(() => {
