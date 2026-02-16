@@ -107,6 +107,7 @@ export const useTwitchStore = defineStore("twitch", () => {
   const favoriteLiveChannels = ref<TwitchApiStream[]>([]);
   const favoriteChannels = ref<FollowedChannel[]>([]);
   const isFavoriteChannelsReverseOrder = ref(false);
+  const favoritedLiveChannelsCountForNavBadge = ref(0);
 
   async function validateToken(): Promise<boolean> {
     const mainStore = useMainStore();
@@ -395,6 +396,8 @@ export const useTwitchStore = defineStore("twitch", () => {
 
     favoriteChannelIds.value.add(channelId);
 
+    favoritedLiveChannelsCountForNavBadge.value++;
+
     mainStore.setStorageItem({
       favoriteChannelIds: Array.from(favoriteChannelIds.value)
     });
@@ -403,10 +406,17 @@ export const useTwitchStore = defineStore("twitch", () => {
   async function removeChannelFromFavorites(channelId: string) {
     favoriteChannelIds.value.delete(channelId);
 
-    // Remove the channel from the favoriteLiveChannels list if it's there
-    favoriteLiveChannels.value = favoriteLiveChannels.value.filter(
-      (channel) => channel.user_id !== channelId
+    const isChannelCurrentlyLive = favoriteLiveChannels.value.some(
+      (channel) => channel.user_id === channelId
     );
+
+    if (isChannelCurrentlyLive) {
+      // Remove the channel from the favoriteLiveChannels list if it's there
+      favoriteLiveChannels.value = favoriteLiveChannels.value.filter(
+        (channel) => channel.user_id !== channelId
+      );
+      favoritedLiveChannelsCountForNavBadge.value--;
+    }
 
     mainStore.setStorageItem({
       favoriteChannelIds: Array.from(favoriteChannelIds.value)
@@ -442,6 +452,9 @@ export const useTwitchStore = defineStore("twitch", () => {
         : response.data;
 
       fetchFavoriteChannelsStatus.value = "success";
+
+      favoritedLiveChannelsCountForNavBadge.value = response.data.length;
+
       return response.data;
     } catch (error) {
       fetchFavoriteChannelsStatus.value = "error";
@@ -519,6 +532,7 @@ export const useTwitchStore = defineStore("twitch", () => {
     isFavoriteChannelsReverseOrder,
     favoriteChannels,
     twitchAuthStatus,
+    favoritedLiveChannelsCountForNavBadge,
     validateToken,
     getTopChannels,
     fetchFollowedLiveChannels,

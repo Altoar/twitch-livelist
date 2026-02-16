@@ -20,7 +20,7 @@
         <div
           class="sidenav__live-count-badge"
           v-else-if="item.link === '#/favorites'">
-          {{ twitchStore.favoriteLiveChannels.length }}
+          {{ twitchStore.favoritedLiveChannelsCountForNavBadge }}
         </div>
       </a>
     </div>
