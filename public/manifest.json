@@ -1,7 +1,7 @@
 {
-  "name": "Twitch Live List",
-  "description": "Browse Twitch live channels and categories in a simple list format. Get notified when your followed channels go live!",
-  "version": "1.0",
+  "name": "Simple Twitch List",
+  "description": "Browse Twitch live channels and categories in a simple list format. Get notified when followed or favorited channels go live!",
+  "version": "1.1",
   "manifest_version": 3,
   "action": {
     "default_popup": "index.html",
@@ -15,7 +15,7 @@
   "externally_connectable": {
     "matches": [
       "http://localhost:5173/*",
-      "https://altoar.github.io/twitch-livelist/*"
+      "https://altoar.github.io/SimpleTwitchList/*"
     ]
   },
   "permissions": ["storage", "notifications", "alarms"],

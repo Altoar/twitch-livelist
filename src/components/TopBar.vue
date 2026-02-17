@@ -1,6 +1,6 @@
 <template>
   <div class="top-bar">
-    <div class="title">Twitch Live List</div>
+    <div class="title">Simple Twitch List</div>
     <div class="user" v-if="mainStore.isLoggedIn">
       {{ mainStore.twitchData?.user?.displayName }}
     </div>

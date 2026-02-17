@@ -79,8 +79,8 @@
       <h3>About</h3>
 
       GitHub:
-      <BaseLink href="https://github.com/Altoar/twitch-livelist" type="text"
-        >https://github.com/Altoar/twitch-livelist</BaseLink
+      <BaseLink href="https://github.com/Altoar/SimpleTwitchList" type="text"
+        >https://github.com/Altoar/SimpleTwitchList</BaseLink
       >
     </div>
 
